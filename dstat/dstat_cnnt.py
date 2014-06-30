@@ -9,13 +9,18 @@ class dstat_plugin(dstat):
         self.vars = ('cnnt',)
         self.type = 'd'
         self.width = 10 
-        #self.scale = 100
-        self.open('/proc/sys/net/netfilter/nf_conntrack_count')
+        self.scale = 0
 
     def extract(self):
-        for l in self.splitlines():
-            if len(l) < 1: continue
-            self.val['cnnt'] = long(l[0]) * 1.0
+	cnt_file='/proc/sys/net/netfilter/nf_conntrack_count'
+	try:
+		cnt_fd=dopen(cnt_file)
+		for l in cnt_fd:
+			self.val['cnnt']=long(l)
+		cnt_fd.close()
+	except:
+		if cnt_fd:
+			cnt_fd.close()
 
 
 # vim:ts=4:sw=4:et
